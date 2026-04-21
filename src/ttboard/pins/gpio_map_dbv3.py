@@ -7,22 +7,22 @@ Created on Nov 8, 2025
 from ttboard.pins.gpio_map_base import GPIOMapBase
 
 class GPIOMapTTDBv3Alpha(GPIOMapBase):
-    RP_PROJCLK = 21
-    PROJECT_nRST = 20
+    RP_PROJCLK = 3
+    PROJECT_nRST = 4
     CTRL_SEL_nRST = 1
     CTRL_SEL_INC = 2
     CTRL_SEL_ENA = 0
-    UO_OUT0 = 30
-    UO_OUT1 = 31
-    UO_OUT2 = 32
-    UO_OUT3 = 33
-    UO_OUT4 = 34
+    UO_OUT0 = 5
+    UO_OUT1 = 6
+    UO_OUT2 = 7
+    UO_OUT3 = 8
+    UO_OUT4 = 9
     UO_OUT5 = 35
     UO_OUT6 = 36 
     UO_OUT7 = 37
-    UI_IN0 = 12
-    UI_IN1 = 13
-    UI_IN2 = 14
+    UI_IN0 = 10
+    UI_IN1 = 11
+    UI_IN2 = 12
     UI_IN3 = 15
     UI_IN4  = 16
     UI_IN5  = 17
@@ -36,7 +36,7 @@ class GPIOMapTTDBv3Alpha(GPIOMapBase):
     UIO5 = 27
     UIO6 = 28
     UIO7 = 29
-    RP_LED = 11
+    RP_LED = 13
 
     # Enable a workaround for a PCB error in TT07 carrier board, which swapped the ctrl_sel_inc and ctrl_sel_nrst lines:
     tt07_cb_fix = False
@@ -88,44 +88,44 @@ class GPIOMapTTDBv3Alpha(GPIOMapBase):
 
 
 class GPIOMapTTDBv3(GPIOMapBase):
-    RP_PROJCLK = 16
-    PROJECT_nRST = 14
+    RP_PROJCLK = 3
+    PROJECT_nRST = 4
     CTRL_SEL_nRST = 1
     CTRL_SEL_INC = 2
     CTRL_SEL_ENA = 0
-    UO_OUT0 = 33
-    UO_OUT1 = 34
-    UO_OUT2 = 35
-    UO_OUT3 = 36
-    UO_OUT4 = 37
+    UO_OUT0 = 5
+    UO_OUT1 = 6
+    UO_OUT2 = 7
+    UO_OUT3 = 8
+    UO_OUT4 = 9
     UO_OUT5 = 38
     UO_OUT6 = 39 
     UO_OUT7 = 40
-    UI_IN0 = 17
-    UI_IN1 = 18
-    UI_IN2 = 19
-    UI_IN3 = 20
-    UI_IN4  = 21
-    UI_IN5  = 22
-    UI_IN6  = 23
-    UI_IN7  = 24
-    UIO0 = 25
-    UIO1 = 26
-    UIO2 = 27
-    UIO3 = 28
-    UIO4 = 29
-    UIO5 = 30
-    UIO6 = 31
-    UIO7 = 32
-    RP_LED = 11
-    MNG00 = 3
-    MNG01 = 4
-    MNG02 = 5
-    MNG03 = 6
-    MNG04 = 7
-    MNG05 = 8
-    MNG06 = 9
-    MNG07 = 10
+    UI_IN0 = 10
+    UI_IN1 = 11
+    UI_IN2 = 12
+    UI_IN3 = 14
+    UI_IN4  = 15
+    UI_IN5  = 16
+    UI_IN6  = 17
+    UI_IN7  = 18
+    UIO0 = 27
+    UIO1 = 28
+    UIO2 = 29
+    UIO3 = 30
+    UIO4 = 31
+    UIO5 = 32
+    UIO6 = 33
+    UIO7 = 34
+    RP_LED = 13
+    MNG00 = 19
+    MNG01 = 20
+    MNG02 = 21
+    MNG03 = 22
+    MNG04 = 23
+    MNG05 = 24
+    MNG06 = 25
+    MNG07 = 26
 
     # Enable a workaround for a PCB error in TT07 carrier board, which swapped the ctrl_sel_inc and ctrl_sel_nrst lines:
     tt07_cb_fix = False
