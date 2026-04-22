@@ -66,16 +66,16 @@ import machine
 ###@micropython.native
 def write_ui_in_byte(val):
     # move the value bits to GPIO spots
-    # inputs start on GPIO17
+    # inputs start on GPIO18
     # xor with current GPIO values, and mask to keep only input bits
-    changedVal = (machine.mem32[0xd0000010] ^ (val << 17) ) & (0xff << 17)
+    changedVal = (machine.mem32[0xd0000010] ^ (val << 18) ) & (0xff << 18)
     # changedVal is now be all the input bits that have CHANGED:
     # writing to GPIO_OUT_XOR will flip any GPIO where a 1 is found
     machine.mem32[0xd0000028] = changedVal
     
 ###@micropython.native
 def read_ui_in_byte():
-    return ( (machine.mem32[0xd0000004] & (0xff << 17)) >> 17)
+    return ( (machine.mem32[0xd0000004] & (0xff << 18)) >> 18)
 
 
 ###@micropython.native
@@ -83,14 +83,13 @@ def write_uio_byte(val):
     # dump_portset('uio', val)
     # low level machine stuff
     # move the value bits to GPIO spots
-    # for bidir, all uio bits are in a line starting 
-    # at GPIO 25
-    valL = (val & 0x7f) << 25
-    valH = (val & 0x80) >> 7
-    valL = (machine.mem32[0xd0000010] ^ valL) & (0x7f << 25)
-    valH = (machine.mem32[0xd0000014] ^ valH) & (0x80 >> 7)
+    # for bidir, low 7 bits at GPIO 27, high bit at GPIO 34
+    valL = (val & 0x7f) << 27
+    valH = (val & 0x80) >> 7 << 2  # bit 7 to bit 2 of HI
+    valL = (machine.mem32[0xd0000010] ^ valL) & (0x7f << 27)
+    valH = (machine.mem32[0xd0000014] ^ valH) & (1 << 2)
     # val is now be all the bits that have CHANGED:
-    # writing to 0xd000001c will flip any GPIO where a 1 is found,
+    # writing to GPIO_OUT_XOR will flip any GPIO where a 1 is found,
     # only applies immediately to pins set as output 
     machine.mem32[0xd0000028] = valL
     machine.mem32[0xd000002C] = valH
@@ -98,25 +97,25 @@ def write_uio_byte(val):
     
 ###@micropython.native
 def read_uio_byte():
-    return ((machine.mem32[0xd0000008] & (0x80 >> 7)) << 7) | ((machine.mem32[0xd0000004] & (0x7f << 25)) >> 25)
+    return ((machine.mem32[0xd0000008] & (1 << 2)) << 7 >> 2) | ((machine.mem32[0xd0000004] & (0x7f << 27)) >> 27)
 
 
 ###@micropython.native
 def read_uio_outputenable():
     # GPIO_OE register, masked for our bidir pins
-    return ((machine.mem32[0xd0000034] & (0x80 >> 7)) << 7) | ((machine.mem32[0xd0000030] & (0x7f << 25)) >> 25)
+    return ((machine.mem32[0xd0000034] & (1 << 2)) << 7 >> 2) | ((machine.mem32[0xd0000030] & (0x7f << 27)) >> 27)
     
     
 ###@micropython.native
 def write_uio_outputenable(val):
     # dump_portset('uio_oe', val)
     # GPIO_OE register, clearing bidir pins and setting any enabled
-    valL = (val & 0x7f) << 25
-    valH = (val & 0x80) >> 7
+    valL = (val & 0x7f) << 27
+    valH = (val & 0x80) >> 7 << 2
     
     # TODO: CHECK
-    machine.mem32[0xd0000030] = (machine.mem32[0xd0000030] & 0x01ffffff) | valL
-    machine.mem32[0xd0000034] = (machine.mem32[0xd0000034] & 0xfffffffe) | valH
+    machine.mem32[0xd0000030] = (machine.mem32[0xd0000030] & 0x07ffffff) | valL
+    machine.mem32[0xd0000034] = (machine.mem32[0xd0000034] & 0xfffffffb) | valH
                                  
 ###@micropython.native
 def write_uo_out_byte(val):
@@ -124,28 +123,28 @@ def write_uo_out_byte(val):
     # low level machine stuff
     # move the value bits to GPIO spots
     
-    val = (val << 1)
-    val = (machine.mem32[0xd0000014] ^ val) & (0xff << 1)
+    val = (val << 5)
+    val = (machine.mem32[0xd0000010] ^ val) & (0xff << 5)
     # val is now be all the bits that have CHANGED:
     # flip any GPIO where a 1 is found,
     # only applies immediately to pins set as output 
-    machine.mem32[0xd000002C] = val
+    machine.mem32[0xd0000028] = val
 
 ###@micropython.native
 def read_uo_out_byte():
-    return ( (machine.mem32[0xd0000008] & (0xff << 1)) >> 1)
+    return ( (machine.mem32[0xd0000004] & (0xff << 5)) >> 5)
 
 ###@micropython.native
 def read_clock():
-    # clock is on GPIO16
-    return ((machine.mem32[0xd0000010] & (1 << 16)) >> 16)
+    # clock is on GPIO3
+    return ((machine.mem32[0xd0000010] & (1 << 3)) >> 3)
    
 ###@micropython.native
 def write_clock(val):
     # not a huge optimization, as this is a single bit, 
     # but 5% or so counts when using the microcotb tests
     if val:
-        machine.mem32[0xd0000018] = (1 << 16) 
+        machine.mem32[0xd0000018] = (1 << 3) 
     else:
-        machine.mem32[0xd0000020] = (1 << 16)
+        machine.mem32[0xd0000020] = (1 << 3)
     
