@@ -85,9 +85,9 @@ def write_uio_byte(val):
     # move the value bits to GPIO spots
     # for bidir, low 7 bits at GPIO 27, high bit at GPIO 34
     valL = (val & 0x7f) << 27
-    valH = (val & 0x80) >> 7 << 2  # bit 7 to bit 2 of HI
+    valH = (val & 0x80) >> 5 
     valL = (machine.mem32[0xd0000010] ^ valL) & (0x7f << 27)
-    valH = (machine.mem32[0xd0000014] ^ valH) & (1 << 2)
+    valH = (machine.mem32[0xd0000014] ^ valH) & (0x80 >> 5)
     # val is now be all the bits that have CHANGED:
     # writing to GPIO_OUT_XOR will flip any GPIO where a 1 is found,
     # only applies immediately to pins set as output 
@@ -97,13 +97,13 @@ def write_uio_byte(val):
     
 ###@micropython.native
 def read_uio_byte():
-    return ((machine.mem32[0xd0000008] & (1 << 2)) << 7 >> 2) | ((machine.mem32[0xd0000004] & (0x7f << 27)) >> 27)
+    return ((machine.mem32[0xd0000008] & (0x80 >> 5)) << 5) | ((machine.mem32[0xd0000004] & (0x7f << 27)) >> 27)
 
 
 ###@micropython.native
 def read_uio_outputenable():
     # GPIO_OE register, masked for our bidir pins
-    return ((machine.mem32[0xd0000034] & (1 << 2)) << 7 >> 2) | ((machine.mem32[0xd0000030] & (0x7f << 27)) >> 27)
+    return ((machine.mem32[0xd0000034] & (0x80 >> 5)) << 5) | ((machine.mem32[0xd0000030] & (0x7f << 27)) >> 27)
     
     
 ###@micropython.native
@@ -111,7 +111,7 @@ def write_uio_outputenable(val):
     # dump_portset('uio_oe', val)
     # GPIO_OE register, clearing bidir pins and setting any enabled
     valL = (val & 0x7f) << 27
-    valH = (val & 0x80) >> 7 << 2
+    valH = (val & 0x80) >> 5
     
     # TODO: CHECK
     machine.mem32[0xd0000030] = (machine.mem32[0xd0000030] & 0x07ffffff) | valL

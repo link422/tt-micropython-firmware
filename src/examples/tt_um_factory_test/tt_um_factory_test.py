@@ -17,7 +17,8 @@ TESTING_BIT = 2
 INREADY_BIT = 3
 VALID_BIT = 4
 
-SPI_EDGE_WAIT_CYCLES = 3
+# Increased in hopes of helping timing
+SPI_EDGE_WAIT_CYCLES = 10
 
 
 def pack_ui(sck=0, mosi=0, cs=1):
