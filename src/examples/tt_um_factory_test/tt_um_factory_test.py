@@ -7,7 +7,7 @@ from microcotb.triggers import ClockCycles
 
 
 
-SCK_BIT = 0
+SCK_BIT = 3
 MOSI_BIT = 1
 CS_BIT = 2
 
