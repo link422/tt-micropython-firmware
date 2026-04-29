@@ -6,7 +6,7 @@ from microcotb.clock import Clock
 from microcotb.triggers import ClockCycles
 
 
-
+#Change SCK_BIT to 0 for dev board
 SCK_BIT = 3
 MOSI_BIT = 1
 CS_BIT = 2
