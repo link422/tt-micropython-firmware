@@ -17,8 +17,7 @@ TESTING_BIT = 2
 INREADY_BIT = 3
 VALID_BIT = 4
 
-# Increased in hopes of helping timing
-SPI_EDGE_WAIT_CYCLES = 10
+SPI_EDGE_WAIT_CYCLES = 50
 
 
 def pack_ui(sck=0, mosi=0, cs=1):
@@ -26,7 +25,7 @@ def pack_ui(sck=0, mosi=0, cs=1):
 
 
 def get_uo_bit(dut, bit_index):
-    return (dut.uo_out[bit_index])
+    return int(dut.uo_out[bit_index])
 
 # Code version of matrix multiplication to use as golden model.
 def matrix_multiply(a_matrix, b_matrix):
