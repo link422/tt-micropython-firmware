@@ -164,6 +164,14 @@ async def test_project_matrix_multiply(dut):
 
     observed_words = await spi_read_results(dut, spi_state)
 
+    dut._log.info("Expected matrix:")
+    for i in range(0, 9, 3):
+        dut._log.info(f"{expected_words[i:i+3]}")
+
+    dut._log.info("Observed matrix:")
+    for i in range(0, 9, 3):
+        dut._log.info(f"{observed_words[i:i+3]}")
+
     assert observed_words == expected_words, (
         f"Matrix multiply mismatch. Expected {expected_words}, got {observed_words}"
     )
