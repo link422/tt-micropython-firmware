@@ -67,6 +67,10 @@ jobs:
         run: |
           cp -r tt_rp2350_board/ micropython/ports/rp2/boards/
 
+      - name: Patch board CMake config to define PICO_FLASH_SIZE_BYTES
+        run: |
+          echo "set(PICO_FLASH_SIZE_BYTES 4194304)" >> micropython/ports/rp2/boards/tt_rp2350_board/mpconfigboard.cmake
+
       - name: Prepare FS root
         working-directory: sdk_repo
         run: |
