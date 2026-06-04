@@ -125,7 +125,7 @@ jobs:
         run: |
           make clean
           make submodules
-          make -j$(nproc) BOARD=tt_rp2350_board PICO_FLASH_SIZE_BYTES=2097152
+          make -j$(nproc) BOARD=tt_rp2350_board
           
     
       - name: Build the final UF2
