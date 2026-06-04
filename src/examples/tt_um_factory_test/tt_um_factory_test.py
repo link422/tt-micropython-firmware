@@ -49,7 +49,7 @@ def flatten_input_words(a_matrix, b_matrix):
             words.append(b_matrix[row][col])
 
     return words
-"""
+
 # Parses space or comma separated matrix into format needed
 def parse_matrix_values(matrix_text):
     tokens = matrix_text.replace(',', ' ').split()
@@ -73,7 +73,7 @@ def prompt_matrix(name):
         except ValueError as exc:
             print(exc)
             continue
-"""
+
 # polls output bit until it becomes expected value or will raise an error.
 async def wait_for_output_bit(dut, bit_index, value=1, timeout_cycles=500):
     for _ in range(timeout_cycles):
@@ -157,30 +157,20 @@ async def test_project_matrix_multiply(dut):
     clock = Clock(dut.clk, 100, units="us")
     cocotb.start_soon(clock.start())
 
-    # try:
-    #     a_matrix = prompt_matrix("A")
-    #     b_matrix = prompt_matrix("B")
-    # except (EOFError, KeyboardInterrupt):
-    #     a_matrix = [
-    #         [1, 2, 3],
-    #         [4, 5, 6],
-    #         [7, 8, 9],
-    #     ]
-    #     b_matrix = [
-    #         [1, 2, 3],
-    #         [4, 5, 6],
-    #         [7, 8, 9],
-    #     ]
-    a_matrix = [
-        [1, 2, 3],
-        [4, 5, 6],
-        [7, 8, 9],
-    ]
-    b_matrix = [
-        [1, 2, 3],
-        [4, 5, 6],
-        [7, 8, 9],
-    ]
+    try:
+        a_matrix = prompt_matrix("A")
+        b_matrix = prompt_matrix("B")
+    except (EOFError, KeyboardInterrupt):
+        a_matrix = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+        ]
+        b_matrix = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+        ]
 
     expected = matrix_multiply(a_matrix, b_matrix)
     expected_words = [value for row in expected for value in row]
