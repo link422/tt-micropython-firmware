@@ -50,6 +50,30 @@ def flatten_input_words(a_matrix, b_matrix):
 
     return words
 
+# Parses space or comma separated matrix into format needed
+def parse_matrix_values(matrix_text):
+    tokens = matrix_text.replace(',', ' ').split()
+    if len(tokens) != 9:
+        raise ValueError(f'Expected 9 values, got {len(tokens)}: {matrix_text}')
+    values = [int(token, 0) for token in tokens]
+    return [values[i * 3 : (i + 1) * 3] for i in range(3)]
+
+
+def prompt_matrix(name):
+    print(f"Enter matrix {name} values for a 3x3 matrix.")
+    print("Enter exactly 9 integers separated by spaces or commas.")
+    print("Example: 1 2 3 4 5 6 7 8 9")
+    while True:
+        matrix_text = input(f"{name} matrix: ").strip()
+        if not matrix_text:
+            print("Please enter 9 integer values for the full matrix.")
+            continue
+        try:
+            return parse_matrix_values(matrix_text)
+        except ValueError as exc:
+            print(exc)
+            continue
+
 # polls output bit until it becomes expected value or will raise an error.
 async def wait_for_output_bit(dut, bit_index, value=1, timeout_cycles=500):
     for _ in range(timeout_cycles):
@@ -133,16 +157,21 @@ async def test_project_matrix_multiply(dut):
     clock = Clock(dut.clk, 100, units="us")
     cocotb.start_soon(clock.start())
 
-    a_matrix = [
-        [1, 2, 3],
-        [4, 5, 6],
-        [7, 8, 9],
-    ]
-    b_matrix = [
-        [1, 2, 3],
-        [4, 5, 6],
-        [7, 8, 9],
-    ]
+    try:
+        a_matrix = prompt_matrix("A")
+        b_matrix = prompt_matrix("B")
+    except (EOFError, KeyboardInterrupt):
+        a_matrix = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+        ]
+        b_matrix = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+        ]
+
     expected = matrix_multiply(a_matrix, b_matrix)
     expected_words = [value for row in expected for value in row]
 
