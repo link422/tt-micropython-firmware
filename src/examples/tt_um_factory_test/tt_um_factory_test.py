@@ -151,6 +151,63 @@ async def spi_read_results(dut, spi_state):
 
     return words
 
+# This function will try to isolate the flipped bit by first figuring out which row or column was effected then manually test flipping bits within
+def find_flipped_input_bit(a_matrix, b_matrix, expected_words, observed_words):
+    if expected_words == observed_words:
+        return None, None, None
+    
+    # Convert to 3x3 for easier analysis
+    expected_matrix = [expected_words[i*3:(i+1)*3] for i in range(3)]
+    observed_matrix = [observed_words[i*3:(i+1)*3] for i in range(3)]
+    
+    # Find which output rows and columns are affected
+    affected_rows = set()
+    affected_cols = set()
+    
+    for i in range(3):
+        for j in range(3):
+            if expected_matrix[i][j] != observed_matrix[i][j]:
+                affected_rows.add(i)
+                affected_cols.add(j)
+    
+    # Determine candidates based on pattern
+    candidates = []
+    
+    if len(affected_rows) == 1 and len(affected_cols) == 3:
+        # Only one row affected → flip is in that row of A
+        row = list(affected_rows)[0]
+        for col in range(3):
+            candidates.append(("A", row, col))
+    elif len(affected_cols) == 1 and len(affected_rows) == 3:
+        # Only one column affected → flip is in that column of B
+        col = list(affected_cols)[0]
+        for row in range(3):
+            candidates.append(("B", row, col))
+    else:
+        # Fallback: could be in any A[i][k] or B[k][j] touching affected rows/cols
+        for i in affected_rows:
+            for k in range(3):
+                candidates.append(("A", i, k))
+        for k in range(3):
+            for j in affected_cols:
+                candidates.append(("B", k, j))
+    
+    # Brute force only the candidates (at most 3 elements × 4 bits = 12 checks)
+    for matrix_name, row, col in candidates:
+        original_value = a_matrix[row][col] if matrix_name == "A" else b_matrix[row][col]
+        
+        for bit_pos in range(4):  # Input element bit width is 4 bits
+            test_matrix = [r[:] for r in (a_matrix if matrix_name == "A" else b_matrix)]
+            test_matrix[row][col] = original_value ^ (1 << bit_pos)
+            
+            test_result = matrix_multiply(test_matrix, b_matrix) if matrix_name == "A" else matrix_multiply(a_matrix, test_matrix)
+            test_words = [value for r in test_result for value in r]
+            
+            if test_words == observed_words:
+                return matrix_name, (row, col), bit_pos
+    
+    return None, None, None
+
 
 @cocotb.test()
 async def test_project_matrix_multiply(dut):
@@ -201,9 +258,21 @@ async def test_project_matrix_multiply(dut):
     for i in range(0, 9, 3):
         dut._log.info(f"{observed_words[i:i+3]}")
 
-    assert observed_words == expected_words, (
-        f"Matrix multiply mismatch. Expected {expected_words}, got {observed_words}"
-    )
+    # If the answer does not match what is expected it will try to find the exact bit that was altered
+    if observed_words != expected_words:
+        matrix_name, location, bit_pos = find_flipped_input_bit(
+            a_matrix, b_matrix, expected_words, observed_words
+        )
+        if matrix_name:
+            row, col = location
+            dut._log.info(f"FOUND FLIPPED BIT: Matrix {matrix_name}[{row}][{col}], bit {bit_pos}")
+        else:
+            dut._log.info("Could not identify flipped bit from pattern")
+        assert False, (
+            f"Matrix multiply mismatch. Expected {expected_words}, got {observed_words}"
+        )
+    
+    dut._log.info("Test passed - matrices match!")
 
     await ClockCycles(dut.clk, 5)
     assert get_uo_bit(dut, READY_BIT) == 0, "READY flag should clear after result readout"
